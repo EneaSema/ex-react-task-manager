@@ -5,7 +5,7 @@ export default function useTasks() {
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:3001/tasks`)
+    fetch(`${VITE_API_URL}/tasks`)
       .then((resp) => resp.json())
       .then((data) => {
         console.log(data);
