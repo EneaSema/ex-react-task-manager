@@ -1,14 +1,11 @@
-import { useState } from "react";
 import { createPortal } from "react-dom";
 
 export default function Modal({
   title,
   content,
   show,
-  onClose = () => {
-    setShow(false);
-  },
-  onConfirm = () => {},
+  onClose,
+  onConfirm,
   onConfirmText = "Conferma",
 }) {
   if (!show) return null;
