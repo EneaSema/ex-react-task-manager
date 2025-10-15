@@ -3,10 +3,8 @@ import { GlobalContext } from "../contexts/Globalcontext";
 
 const symbols = `!@#$%^&*()-_=+[]{}|;:'\\",.<>?/~";`;
 
-const symbolsArray = symbols.split();
-
 export default function AddTask() {
-  const { AddTask } = useContext(GlobalContext);
+  const { addTask } = useContext(GlobalContext);
   const [title, setTitle] = useState(``);
   const descriptionRef = useRef();
   const statusRef = useRef();
@@ -32,7 +30,7 @@ export default function AddTask() {
       status: statusRef.current.value,
     };
     try {
-      await AddTask(newTask);
+      await addTask(newTask);
       alert("Task creata con successo!");
       setTitle(``);
       descriptionRef.current.value = ``;
@@ -66,10 +64,10 @@ export default function AddTask() {
         <label>
           {" "}
           Stato:
-          <select ref={statusRef} defaultValue="To-do">
-            <option value="to-do">To do</option>
-            <option value="doing">Doing</option>
-            <option value="done">Done</option>
+          <select ref={statusRef} defaultValue="To do">
+            <option value="To do">To do</option>
+            <option value="Doing">Doing</option>
+            <option value="Done">Done</option>
           </select>
         </label>
         <button type="submit" disabled={titleValidation}>
