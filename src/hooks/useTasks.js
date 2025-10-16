@@ -35,6 +35,36 @@ export default function useTasks() {
     setTasks((tasks) => tasks.filter((t) => t.id !== taskID));
   };
 
+  const removeMultipleTasks = async (taskIds) => {
+    const deleteRequests = taskIds.map((taskID) => {
+      fetch(`${VITE_API_URL}/tasks/${taskID}`, {
+        method: `DELETE`,
+      }).then((resp) => resp.json());
+    });
+    const results = await Promise.allSettled(deleteRequests);
+
+    const fullFilledDeletions = [];
+    const rejectedDeletions = [];
+    results.forEach((result, index) => {
+      const taskId = taskIds[index];
+      if (results.status === "fulfilled" && result.value.success) {
+        fullFilledDeletions.push(taskId);
+      } else rejectedDeletions.push(taskId);
+    });
+    if (fullFilledDeletions.length > 0) {
+      setTasks((prev) =>
+        prev.filter((t) => !fullFilledDeletions.includes(t.id))
+      );
+    }
+    if (rejectedDeletions.length > 0) {
+      throw new Error(
+        `C'è stato un errore nell'eliminazione delle task con id: ${rejectedDeletions.join(
+          ","
+        )}`
+      );
+    }
+  };
+
   const updateTask = async (updateTask) => {
     const resp = await fetch(`${VITE_API_URL}/tasks/${updateTask.id}`, {
       method: `PUT`,
@@ -50,5 +80,5 @@ export default function useTasks() {
     );
   };
 
-  return { tasks, addTask, removeTask, updateTask };
+  return { tasks, addTask, removeTask, updateTask, removeMultipleTasks };
 }

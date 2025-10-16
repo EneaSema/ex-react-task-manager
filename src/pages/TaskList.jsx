@@ -13,7 +13,7 @@ function debounce(callback, delay) {
 }
 
 export default function TaskList() {
-  const { tasks } = useContext(GlobalContext);
+  const { tasks, removeMultipleTasks } = useContext(GlobalContext);
   console.log("tasks", tasks);
 
   const [searchQuery, setSearchQuery] = useState(``);
@@ -25,6 +25,27 @@ export default function TaskList() {
   const [sortOrder, setSortOrder] = useState(1);
 
   const sortIcon = sortOrder === 1 ? "↓" : "↑";
+
+  const [selectedTaskIds, setSelectedTaskIds] = useState([]);
+
+  const toogleSelection = (taskId) => {
+    if (!selectedTaskIds.includes(taskId)) {
+      setSelectedTaskIds(...selectedTaskIds, taskId);
+    } else {
+      setSelectedTaskIds([...selectedTaskIds].filter((id) => id !== taskId));
+    }
+  };
+
+  const handleRemoveMultipleTasks = async () => {
+    try {
+      await removeMultipleTasks(selectedTaskIds);
+      alert("Eliminazione multipla effettuata");
+      setSelectedTaskIds([]);
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
+  };
 
   const handleSort = (field) => {
     if (sortBy === field) {
@@ -65,10 +86,14 @@ export default function TaskList() {
         placeholder="Fai una ricerca dì una task"
         onChange={(e) => debouncedSetSearchQuery(e.target.value)}
       />
+      {selectedTaskIds.length > 0 && (
+        <button onClick={handleRemoveMultipleTasks}>Elimina Selezionate</button>
+      )}
 
       <table>
         <thead>
           <tr>
+            <th></th>
             <th onClick={() => handleSort(`title`)}>
               Nome {sortBy === "title" && sortIcon}
             </th>
@@ -82,7 +107,12 @@ export default function TaskList() {
         </thead>
         <tbody>
           {filteredAndSortedTask.map((task) => (
-            <TaskRow key={task.id} task={task} />
+            <TaskRow
+              key={task.id}
+              task={task}
+              checked={selectedTaskIds.includes(task.id)}
+              onToogle={toogleSelection}
+            />
           ))}
         </tbody>
       </table>
