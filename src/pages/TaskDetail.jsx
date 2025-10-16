@@ -7,7 +7,7 @@ import EditTaskModal from "../components/EditTaskModal";
 export default function TaskDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { tasks, removeTask } = useContext(GlobalContext);
+  const { tasks, removeTask, updateTask } = useContext(GlobalContext);
   const task = tasks.find((t) => t.id === parseInt(id));
 
   const [showModal, setShowModal] = useState(false);
@@ -24,6 +24,18 @@ export default function TaskDetail() {
       alert(error.message);
     }
   };
+
+  const handleUpdate = async (updatedTask) => {
+    try {
+      await updateTask(updatedTask);
+      alert("Task modificata con successo!");
+      setShowEdit(false);
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
+  };
+
   return (
     <div>
       <h1>Task Detail</h1>
@@ -42,9 +54,7 @@ export default function TaskDetail() {
         {new Date(task.createdAt).toLocaleDateString()}
       </p>
       <button onClick={() => setShowModal(true)}>Elimina Task</button>
-      <EditTaskModal />
       <button onClick={() => setShowEdit(true)}>Modifica Task</button>
-      <EditTaskModal />
 
       <Modal
         title="Conferma Eliminazione"
@@ -53,6 +63,12 @@ export default function TaskDetail() {
         onClose={() => setShowModal(false)}
         onConfirm={handleDelete}
         onConfirmText="Elimina"
+      />
+      <EditTaskModal
+        task={task}
+        show={showEdit}
+        onClose={() => setShowEdit(false)}
+        onSave={handleUpdate}
       />
     </div>
   );

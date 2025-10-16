@@ -65,9 +65,11 @@ export default function AddTask() {
           {" "}
           Stato:
           <select ref={statusRef} defaultValue="To do">
-            <option value="To do">To do</option>
-            <option value="Doing">Doing</option>
-            <option value="Done">Done</option>
+            {[`To do`, `Doing`, `Done`].map((value, inedx) => {
+              <option key={inedx} value={value}>
+                {value}
+              </option>;
+            })}
           </select>
         </label>
         <button type="submit" disabled={titleValidation}>
