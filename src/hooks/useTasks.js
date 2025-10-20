@@ -36,18 +36,18 @@ export default function useTasks() {
   };
 
   const removeMultipleTasks = async (taskIds) => {
-    const deleteRequests = taskIds.map((taskID) => {
+    const deleteRequests = taskIds.map((taskID) =>
       fetch(`${VITE_API_URL}/tasks/${taskID}`, {
         method: `DELETE`,
-      }).then((resp) => resp.json());
-    });
+      }).then((resp) => resp.json())
+    );
     const results = await Promise.allSettled(deleteRequests);
 
     const fullFilledDeletions = [];
     const rejectedDeletions = [];
     results.forEach((result, index) => {
       const taskId = taskIds[index];
-      if (results.status === "fulfilled" && result.value.success) {
+      if (result.status === "fulfilled" && result.value.success) {
         fullFilledDeletions.push(taskId);
       } else rejectedDeletions.push(taskId);
     });

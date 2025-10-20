@@ -65,10 +65,12 @@ export default function AddTask() {
           {" "}
           Stato:
           <select ref={statusRef} defaultValue="To do">
-            {[`To do`, `Doing`, `Done`].map((value, inedx) => {
-              <option key={inedx} value={value}>
-                {value}
-              </option>;
+            {[`To do`, `Doing`, `Done`].map((value, index) => {
+              return (
+                <option key={index} value={value}>
+                  {value}
+                </option>
+              );
             })}
           </select>
         </label>

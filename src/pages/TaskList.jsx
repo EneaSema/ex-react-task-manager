@@ -28,15 +28,15 @@ export default function TaskList() {
 
   const [selectedTaskIds, setSelectedTaskIds] = useState([]);
 
-  const toogleSelection = (taskId) => {
-    if (!selectedTaskIds.includes(taskId)) {
-      setSelectedTaskIds(...selectedTaskIds, taskId);
+  const toggleSelection = (taskId) => {
+    if (selectedTaskIds.includes(taskId)) {
+      setSelectedTaskIds((prev) => prev.filter((id) => id !== taskId));
     } else {
-      setSelectedTaskIds([...selectedTaskIds].filter((id) => id !== taskId));
+      setSelectedTaskIds((prev) => [...prev, taskId]);
     }
   };
 
-  const handleRemoveMultipleTasks = async () => {
+  const handleDeleteSelected = async () => {
     try {
       await removeMultipleTasks(selectedTaskIds);
       alert("Eliminazione multipla effettuata");
@@ -87,7 +87,7 @@ export default function TaskList() {
         onChange={(e) => debouncedSetSearchQuery(e.target.value)}
       />
       {selectedTaskIds.length > 0 && (
-        <button onClick={handleRemoveMultipleTasks}>Elimina Selezionate</button>
+        <button onClick={handleDeleteSelected}>Elimina Selezionate</button>
       )}
 
       <table>
@@ -111,7 +111,7 @@ export default function TaskList() {
               key={task.id}
               task={task}
               checked={selectedTaskIds.includes(task.id)}
-              onToogle={toogleSelection}
+              onToggle={toggleSelection}
             />
           ))}
         </tbody>
