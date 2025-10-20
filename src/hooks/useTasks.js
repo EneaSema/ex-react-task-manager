@@ -1,20 +1,25 @@
-import { useState, useEffect } from "react";
+import { useEffect, useReducer } from "react";
+import tasksReducer from "../reducers/tasksReducer";
 const { VITE_API_URL } = import.meta.env;
 
 export default function useTasks() {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, dispatchTasks] = useReducer(tasksReducer, []);
 
   useEffect(() => {
     fetch(`${VITE_API_URL}/tasks`)
       .then((resp) => resp.json())
       .then((data) => {
         console.log(data);
-        setTasks(data);
+        dispatchTasks({ type: `LOAD_TASK`, payload: data });
       })
       .catch((error) => console.error(error));
   }, []);
 
   const addTask = async (newTask) => {
+    const taskExists = tasks.some((t) => t.title === newTask.title);
+    if (taskExists) {
+      throw new Error("Task già presente");
+    }
     const resp = await fetch(`${VITE_API_URL}/tasks`, {
       method: `POST`,
       headers: { "Content-Type": "application/json" },
@@ -23,7 +28,7 @@ export default function useTasks() {
 
     const { success, message, task } = await resp.json();
     if (!success) throw new Error(message);
-    setTasks((prev) => [...prev, task]);
+    dispatchTasks({ type: `ADD_TASK`, payload: task });
   };
 
   const removeTask = async (taskID) => {
@@ -32,7 +37,7 @@ export default function useTasks() {
     });
     const { success, message } = await resp.json();
     if (!success) throw new Error(message);
-    setTasks((tasks) => tasks.filter((t) => t.id !== taskID));
+    dispatchTasks({ type: `REMOVE_TASK`, payload: taskID });
   };
 
   const removeMultipleTasks = async (taskIds) => {
@@ -52,9 +57,10 @@ export default function useTasks() {
       } else rejectedDeletions.push(taskId);
     });
     if (fullFilledDeletions.length > 0) {
-      setTasks((prev) =>
-        prev.filter((t) => !fullFilledDeletions.includes(t.id))
-      );
+      dispatchTasks({
+        type: `REMOVE_MULTIPLE_TASKS`,
+        payload: fullFilledDeletions,
+      });
     }
     if (rejectedDeletions.length > 0) {
       throw new Error(
@@ -66,18 +72,19 @@ export default function useTasks() {
   };
 
   const updateTask = async (updateTask) => {
+    const taskWithSameTitle = tasks.find((t) => t.title === updateTask.title);
+    if (taskWithSameTitle && taskWithSameTitle.id !== updateTask.id) {
+      throw new Error("Task già presente");
+    }
     const resp = await fetch(`${VITE_API_URL}/tasks/${updateTask.id}`, {
       method: `PUT`,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updateTask),
     });
 
-    const { success, message, task: newTask } = await resp.json();
+    const { success, message, task } = await resp.json();
     if (!success) throw new Error(message);
-
-    setTasks((prev) =>
-      prev.map((oldTask) => (oldTask.id === newTask.id ? newTask : oldTask))
-    );
+    dispatchTasks({ type: `UPDATE_TASK`, payload: task });
   };
 
   return { tasks, addTask, removeTask, updateTask, removeMultipleTasks };

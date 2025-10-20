@@ -44,9 +44,11 @@ export default function EditTaskModal({ show, onClose, task, onSave }) {
                 onChange={(e) => changeEditedTask(`status`, e)}
               >
                 {[`To do`, `Doing`, `Done`].map((value, inedx) => {
-                  <option key={inedx} value={value}>
-                    {value}
-                  </option>;
+                  return (
+                    <option key={inedx} value={value}>
+                      {value}
+                    </option>
+                  );
                 })}
               </select>
             </label>

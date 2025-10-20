@@ -3,6 +3,7 @@ import { useContext, useState } from "react";
 import { GlobalContext } from "../contexts/Globalcontext";
 import Modal from "../components/Modal";
 import EditTaskModal from "../components/EditTaskModal";
+import dayjs from "dayjs";
 
 export default function TaskDetail() {
   const { id } = useParams();
@@ -51,7 +52,7 @@ export default function TaskDetail() {
       </p>
       <p>
         <strong>Data di creazione:</strong>
-        {new Date(task.createdAt).toLocaleDateString()}
+        {dayjs(task.createdAt).format(`DD/MM/YYYY`)}
       </p>
       <button onClick={() => setShowModal(true)}>Elimina Task</button>
       <button onClick={() => setShowEdit(true)}>Modifica Task</button>
